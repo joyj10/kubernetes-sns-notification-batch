@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: notification-batch
+  namespace: sns
+spec:
+  schedule: "*/1 * * * *"   # 가장 빠른 실행 1분
+  jobTemplate:
+    spec:
+      parallelism: 1    # 병렬 실행 여부(동시에 같이 메일 발송 될 수 있어서 1)
+      completions: 1    # 1분 1번 실행되는 평범한 배치
+      backoffLimit: 2
+      ttlSecondsAfterFinished: 120  # 120초 후에 파드 자동 정리되도록 설정
+      template:
+        spec:
+          restartPolicy: Never      # 주기적으로 배치 되기 때문에 재시작할 필요 없어서 Never
+          containers:
+            - name: notification-container
+              image: 638597541124.dkr.ecr.ap-northeast-2.amazonaws.com/notification-batch:0.0.1
+              env:
+                - name: SPRING_PROFILES_ACTIVE
+                  value: dev
+              envFrom:
+                - configMapRef:
+                    name: mysql-config
+                - secretRef:
+                    name: mysql-secret
+                - configMapRef:
+                    name: email-config
+                - secretRef:
+                    name: email-secret
