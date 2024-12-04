@@ -1,7 +1,7 @@
 spring:
   batch:
     jdbc:
-      initialize-schema: always
+      initialize-schema: always   #배치에 필요한 테이블 자동 생성
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/sns
